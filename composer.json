@@ -1,6 +1,6 @@
 {
     "name": "prajwal89/webhook-verifier",
-    "description": "verify incoming webhooks with php",
+    "description": "Verify incoming webhooks with php",
     "type": "library",
     "license": "MIT",
     "autoload": {
