@@ -26,7 +26,7 @@ class WebhookVerifier
      * Constructor
      *
      * @param  string  $secret  The webhook secret key
-     * @param  int  $tolerance Tolerance in seconds
+     * @param  int  $tolerance  Tolerance in seconds
      */
     public function __construct(
         private string $secret,
@@ -115,8 +115,6 @@ class WebhookVerifier
      */
     public function sign(string $msgId, int $timestamp, string $payload): string
     {
-        $timestamp = (string) $timestamp;
-
         if (!$this->isPositiveInteger($timestamp)) {
             throw new SignatureException('Invalid timestamp');
         }
