@@ -1,7 +1,8 @@
 <?php
 
-namespace Prajwal89\WebhookVerifier;
+declare(strict_types=1);
 
+namespace Prajwal89\WebhookVerifier;
 
 use InvalidArgumentException;
 use Prajwal89\WebhookVerifier\Exceptions\SignatureException;
@@ -9,12 +10,12 @@ use Prajwal89\WebhookVerifier\Exceptions\TimestampException;
 
 /**
  * Webhook Verifier for Standard Webhooks Implementation
- * 
+ *
  * @see https://github.com/standard-webhooks/standard-webhooks
  */
 class WebhookVerifier
 {
-    private const SECRET_PREFIX = "whsec_";
+    private const SECRET_PREFIX = 'whsec_';
 
     /**
      * Time Tolerance in seconds for webhook timestamp verification
@@ -29,7 +30,7 @@ class WebhookVerifier
     /**
      * Constructor
      *
-     * @param string $secret The webhook secret key
+     * @param  string  $secret  The webhook secret key
      */
     public function __construct(string $secret)
     {
@@ -43,22 +44,23 @@ class WebhookVerifier
     /**
      * Create a verifier with a raw (already decoded) secret
      *
-     * @param string $secret Raw secret string
-     * @return self
+     * @param  string  $secret  Raw secret string
      */
     public static function fromRaw(string $secret): self
     {
         $obj = new self('');
         $obj->secret = $secret;
+
         return $obj;
     }
 
     /**
      * Verify a webhook payload against its signature
      *
-     * @param string $payload The webhook payload (JSON string)
-     * @param array $headers The webhook headers
+     * @param  string  $payload  The webhook payload (JSON string)
+     * @param  array  $headers  The webhook headers
      * @return array The decoded payload if verification succeeds
+     *
      * @throws WebhookVerificationException If verification fails
      */
     public function verify(string $payload, array $headers): array
@@ -68,7 +70,7 @@ class WebhookVerifier
             !isset($headers['webhook-timestamp']) ||
             !isset($headers['webhook-signature'])
         ) {
-            throw new InvalidArgumentException("Missing required webhook headers");
+            throw new InvalidArgumentException('Missing required webhook headers');
         }
 
         $msgId = $headers['webhook-id'];
@@ -91,7 +93,7 @@ class WebhookVerifier
             $version = $sigParts[0];
             $passedSignature = $sigParts[1];
 
-            if (strcmp($version, "v1") !== 0) {
+            if (strcmp($version, 'v1') !== 0) {
                 continue; // Skip unknown versions
             }
 
@@ -100,16 +102,17 @@ class WebhookVerifier
             }
         }
 
-        throw new SignatureException("No matching signature found");
+        throw new SignatureException('No matching signature found');
     }
 
     /**
      * Sign a message with the webhook secret
      *
-     * @param string $msgId The webhook ID
-     * @param int $timestamp The webhook timestamp
-     * @param string $payload The webhook payload
+     * @param  string  $msgId  The webhook ID
+     * @param  int  $timestamp  The webhook timestamp
+     * @param  string  $payload  The webhook payload
      * @return string The signature
+     *
      * @throws SignatureException If signature generation fails
      */
     public function sign(string $msgId, int $timestamp, string $payload): string
@@ -117,7 +120,7 @@ class WebhookVerifier
         $timestamp = (string) $timestamp;
 
         if (!$this->isPositiveInteger($timestamp)) {
-            throw new SignatureException("Invalid timestamp");
+            throw new SignatureException('Invalid timestamp');
         }
 
         $toSign = "{$msgId}.{$timestamp}.{$payload}";
@@ -130,8 +133,9 @@ class WebhookVerifier
     /**
      * Verify the timestamp is within tolerance
      *
-     * @param string $timestampHeader The timestamp from headers
+     * @param  string  $timestampHeader  The timestamp from headers
      * @return int The verified timestamp
+     *
      * @throws TimestampException If timestamp is invalid or outside tolerance
      */
     private function verifyTimestamp(string $timestampHeader): int
@@ -141,15 +145,15 @@ class WebhookVerifier
         try {
             $timestamp = intval($timestampHeader, 10);
         } catch (\Exception $e) {
-            throw new TimestampException("Invalid timestamp format");
+            throw new TimestampException('Invalid timestamp format');
         }
 
         if ($timestamp < ($now - self::TOLERANCE)) {
-            throw new TimestampException("Message timestamp too old");
+            throw new TimestampException('Message timestamp too old');
         }
 
         if ($timestamp > ($now + self::TOLERANCE)) {
-            throw new TimestampException("Message timestamp too new");
+            throw new TimestampException('Message timestamp too new');
         }
 
         return $timestamp;
@@ -158,11 +162,11 @@ class WebhookVerifier
     /**
      * Check if a value is a positive integer
      *
-     * @param mixed $v The value to check
+     * @param  mixed  $v  The value to check
      * @return bool True if value is a positive integer
      */
     private function isPositiveInteger($v): bool
     {
-        return is_numeric($v) && !is_float($v + 0) && (int) $v == $v && (int) $v > 0;
+        return is_numeric($v) && !is_float($v + 0) && (int) $v === $v && (int) $v > 0;
     }
 }

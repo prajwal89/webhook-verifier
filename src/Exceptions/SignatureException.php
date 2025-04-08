@@ -1,9 +1,10 @@
 <?php
 
-namespace Prajwal89\WebhookVerifier\Exceptions;
+declare(strict_types=1);
 
+namespace Prajwal89\WebhookVerifier\Exceptions;
 
 class SignatureException extends \Exception
 {
-    // 
+    //
 }
