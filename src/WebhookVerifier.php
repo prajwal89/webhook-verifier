@@ -23,17 +23,15 @@ class WebhookVerifier
     private const TOLERANCE = 300; // 5 minutes (5 * 60 seconds)
 
     /**
-     * @var string The webhook secret key used for verification
-     */
-    private string $secret;
-
-    /**
      * Constructor
      *
      * @param  string  $secret  The webhook secret key
+     * @param  int  $tolerance Tolerance in seconds
      */
-    public function __construct(string $secret)
-    {
+    public function __construct(
+        private string $secret,
+        private int $tolerance = self::TOLERANCE
+    ) {
         if (substr($secret, 0, strlen(self::SECRET_PREFIX)) === self::SECRET_PREFIX) {
             $secret = substr($secret, strlen(self::SECRET_PREFIX));
         }
